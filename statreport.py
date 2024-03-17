@@ -126,6 +126,7 @@ def plot_d_scores(df: pd.DataFrame) -> None:
             plt.grid(True)
             plt.title(f"{code_name} Distance Plot")
             plt.savefig(f"{code_name}.png")
+            plt.close()
             print(f"{code_name}.png saved to {os.getcwd()}")
             
 
