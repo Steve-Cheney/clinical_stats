@@ -63,21 +63,30 @@ def df_to_tsv(df: pd.DataFrame, file_path) -> None:
     df.to_csv(file_path, sep='\t', index=False)
 
 
-def _cluster_num(X, max):
+def _cluster_num(X, max, name):
     """Helper fuction for determining optimal cluster number"""
-
     distortions = []
     for i in range(1, max + 1):
         kmeans = KMeans(n_clusters=i, random_state=42)
         kmeans.fit(X)
         distortions.append(kmeans.inertia_)
+    
+    # Plot the elbow graph
+    plt.plot(range(1, max+ 1), distortions, marker='o')
+    plt.title('Elbow Method')
+    plt.xlabel('Number of Clusters')
+    plt.ylabel('Distortion')
+    plt.savefig(f"{name}_elbow.png")
+    plt.close()
 
     # Calc derivitives to find the elbow    
     differences = np.diff(distortions)
     second_differences = np.diff(differences)
 
-    optimal_num = np.argmin(second_differences) + 1
-
+    #optimal_num = np.argmin(second_differences) + 1
+    elbow_index = np.where(second_differences > 0)[0][0] + 1
+    optimal_num = elbow_index + 1
+    
     return optimal_num
 
 
@@ -116,8 +125,8 @@ def plot_d_scores(df: pd.DataFrame) -> None:
 
             #KMeans clustering
             X = np.array(list(zip(x_dist, y_dist)))
-            optimal_num_clusters = _cluster_num(X, 10)
-            kmeans = KMeans(n_clusters=optimal_num_clusters, random_state=42)
+            optimal_num_clusters = _cluster_num(X, 10, code_name)
+            kmeans = KMeans(n_clusters=optimal_num_clusters, random_state=99)
             kmeans.fit(X)
             cluster_labels = kmeans.labels_
 
